@@ -97,6 +97,10 @@ function Game() {
     }
   }
 
+  function clickBooster(){
+    
+  }
+
   if (grid === null) {
     return null;
   }
@@ -121,6 +125,14 @@ function Game() {
         onPathChange={onPathChange}
         onDone={onPathDone}
       />
+    <div className="header"></div>
+    <div className="squares" style={{ gridTemplateColumns: `repeat(${1}, 110px)`, gridTemplateRows: `repeat(${1}, 90px)` }}>
+            <Square
+              value={"Booster"}
+              className={"riseOnHover"}
+              onClick={() => clickBooster()}
+            />
+    </div>
     </div>
   );
 }
