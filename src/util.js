@@ -1,14 +1,11 @@
 export function numberToColor(num) {
-    switch (num) {
-        case 2: return "#249cd1";
-        case 4: return "#ec893b";
-        case 8: return "#e35b89";
-        case 16: return "#af4e7a";
-        case 32: return "#a63e4a";
-        case 64: return "#8d6ebc";
-        default: return "red";
-    }
+    const log = Math.log(num) / Math.log(2);
+    const ColorList = ["#249cd1", "#ec893b", "#e35b89", "#af4e7a", "#a63e4a", "#8d6ebc"]
+    const index = log % ColorList.length;
+    return ColorList[index];
 }
+
+export const hexNum = (num) => num.toString(16);
 
 export const equalPos = (posA, posB) => posA.toString() === posB.toString();
 

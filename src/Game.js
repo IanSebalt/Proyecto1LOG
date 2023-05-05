@@ -98,7 +98,21 @@ function Game() {
   }
 
   function clickBooster(){
-    
+    if(waiting)
+      return;
+    const gridS = JSON.stringify(grid);
+    const pathS = JSON.stringify(path);
+    const queryS = "collapse(" + gridS + "," + numOfColumns + ", RGrids)";
+    setWaiting(true);
+    pengine.query(queryS, (success, response) => {
+      if (success) {
+        setScore(score + joinResult(path, grid, numOfColumns));
+        setPath([]);
+        animateEffect(response['RGrids']);
+      } else {
+        setWaiting(false);
+      }
+    });
   }
 
   if (grid === null) {
