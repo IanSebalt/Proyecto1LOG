@@ -1,8 +1,13 @@
 export function numberToColor(num) {
-    const log = Math.log(num) / Math.log(2);
-    const ColorList = ["#249cd1", "#ec893b", "#e35b89", "#af4e7a", "#a63e4a", "#8d6ebc"]
-    const index = log % ColorList.length;
-    return ColorList[index];
+    if(num === "Booster"){
+       return "black"
+    }
+    else{
+        const log = Math.log(num) / Math.log(2);
+        const ColorList = ["#249cd1", "#ec893b", "#e35b89", "#af4e7a", "#a63e4a", "#8d6ebc"]
+        const index = log % ColorList.length;
+        return ColorList[index];
+    }   
 }
 
 export const hexNum = (num) => num.toString(16);
