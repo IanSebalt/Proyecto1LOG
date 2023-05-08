@@ -11,7 +11,7 @@ library(lists).
  * en la grilla Grid, con número de columnas NumOfColumns. El número 0 representa que la celda está vacía. 
  */ 
 
-join(Grid, NumOfColumns, Path, [RG, GG, FG]):-
+join(Grid, NumOfColumns, Path, [RG | GG]):-
 	pathDelete(Grid, Path, NumOfColumns, R, Rest),
 	last(Path, L),
 	L = [X, Y],
@@ -20,8 +20,7 @@ join(Grid, NumOfColumns, Path, [RG, GG, FG]):-
 	Ins is 2 ** Log,
 	replace(Rest, PosIns, Ins, RG),
 	NumOfColumn is NumOfColumns - 1,
-	gravity(RG, NumOfColumn, NumOfColumns, GG),
-	fillZeros(GG, FG).
+	gravity(RG, NumOfColumn, NumOfColumns, GG).
 
 /**
  * fillZeros(+Grid, -FG)
@@ -29,14 +28,17 @@ join(Grid, NumOfColumns, Path, [RG, GG, FG]):-
  * aleatoria, de acuerdo a un rango.
 */ 
 
-fillZeros(Grid, Grid) :-
-	\+nth0(_, Grid, 0).
-fillZeros(Grid, FG) :-
-	nth0(P, Grid, 0),
+fillZeros(Grid, -1, Grid).
+fillZeros(Grid, NumOfColumn, FG) :-
+	\+nth0(NumOfColumn, Grid, 0),
+	NextColumn is NumOfColumn - 1,
+	fillZeros(Grid, NextColumn, FG).
+fillZeros(Grid, NumOfColumn, FG) :-
+	nth0(NumOfColumn, Grid, 0),
 	randomSquare(Grid, Square),
-	replace(Grid, P, Square, FPG),
-	fillZeros(FPG, FG).
-
+	replace(Grid, NumOfColumn, Square, FPG),
+	NextColumn is NumOfColumn - 1,
+	fillZeros(FPG, NextColumn, FG).
 
 /**
  * randomSquare(-Square)
@@ -57,15 +59,21 @@ randomSquare(_, Square) :-
  * manteniendo la columna NumOfColumn a la que actualmente se le está aplicando gravedad. Se empieza por la última columna.
 */
 
-gravity(Grid, -1, _, Grid).
-gravity(Grid, NumOfColumn, NumOfColumns, GG) :-
+gravity(Grid, -1, NumOfColumns, [Grid]) :-
+	NumOfColumn is NumOfColumns - 1,
+	gotGravOnAllCols(Grid, NumOfColumn, NumOfColumns).
+gravity(Grid, -1, NumOfColumns, [Grid | GT]) :-
+	NumOfColumn is NumOfColumns - 1,
+	\+gotGravOnAllCols(Grid, NumOfColumn, NumOfColumns),
+	gravity(Grid, NumOfColumn, NumOfColumns, GT).
+gravity(Grid, NumOfColumn, NumOfColumns, GList) :-
 	length(Grid, Le),
+	NextColumn is NumOfColumn - 1,
 	NumOfRows is (Le / NumOfColumns) - 1,
 	getAllNaturalsLessThan(NumOfRows, A),
 	findall([X, NumOfColumn], member(X, A), Bag),
 	gravityOnColumn(Grid, Bag, Bag, NumOfColumns, GB),
-	NextColumn is NumOfColumn - 1,
-	gravity(GB, NextColumn, NumOfColumns, GG).
+	gravity(GB, NextColumn, NumOfColumns, GList).
 
 /**
  * gravityOnColumn(+Grid, +GPath, +GFPath, +NumOfColumns, GCG)
@@ -73,15 +81,24 @@ gravity(Grid, NumOfColumn, NumOfColumns, GG) :-
  * recorrer en la columna.
 */
 
-gravityOnColumn(Grid, [], GFPath, NumOfColumns, Grid) :-
-	gotGravCol(Grid, GFPath, NumOfColumns).
-gravityOnColumn(Grid, [], GFPath, NumOfColumns, GCG) :-
-	\+gotGravCol(Grid, GFPath, NumOfColumns),
-	gravityOnColumn(Grid, GFPath, GFPath, NumOfColumns, GCG).
+/**%gotGravCol(Grid, GFPath, NumOfColumns).
+%gravityOnColumn(Grid, [], GFPath, NumOfColumns, GCG) :-
+	%\+gotGravCol(Grid, GFPath, NumOfColumns),
+	%gravityOnColumn(Grid, GFPath, GFPath, NumOfColumns, GCG).
+*/
+
+gravityOnColumn(Grid, [], _, _, Grid).
 gravityOnColumn(Grid, GPath, GFPath, NumOfColumns, GCG) :-
-	GPath = [[X, _] | GPT],
+	GPath = [[X, Y] | GPT],
+	PosIns is (X * NumOfColumns) + (Y mod NumOfColumns),
+	randomSquare(Grid, Square),
 	X = 0,
-	gravityOnColumn(Grid, GPT, GFPath, NumOfColumns, GCG).
+	((nth0(PosIns, Grid, 0),
+	replace(Grid, PosIns, Square, GR),
+	gravityOnColumn(GR, GPT, GFPath, NumOfColumns, GCG));
+	(nth0(PosIns, Grid, P),
+	P > 0,
+	gravityOnColumn(Grid, GPT, GFPath, NumOfColumns, GCG))).
 gravityOnColumn(Grid, GPath, GFPath, NumOfColumns, GCG) :-
 	GPath = [[X, Y] | GPT],
 	PosIns is (X * NumOfColumns) + (Y mod NumOfColumns),
@@ -107,6 +124,16 @@ gravityOnColumn(Grid, GPath, GFPath, NumOfColumns, GCG) :-
  * Devuelve true si la columna marcada por Bag tiene la gravedad aplicada, es decir, que no hay ningun 0 entre un bloque
  * de valor mayor y otro.
 */
+
+gotGravOnAllCols(_, -1, _).
+gotGravOnAllCols(Grid, NumOfColumn, NumOfColumns) :-
+	length(Grid, Le),
+	NumOfRows is (Le / NumOfColumns) - 1,
+	getAllNaturalsLessThan(NumOfRows, A),
+	findall([X, NumOfColumn], member(X, A), Bag),
+	gotGravCol(Grid, Bag, NumOfColumns),
+	NextCol is NumOfColumn - 1,
+	gotGravOnAllCols(Grid, NextCol, NumOfColumns).
 
 gotGravCol(_, [], _).
 gotGravCol(Grid, Bag, NumOfColumns) :-
@@ -170,10 +197,9 @@ collapse(Grid, NumOfColumns, GR) :-
  * numero de columnas NumOfColumns.
 */
 
-pathsDelete(Grid, [], NumOfColumns, [Grid, GG, FG]) :-
+pathsDelete(Grid, [], NumOfColumns, [Grid | GG]) :-
 	NumOfColumn is NumOfColumns - 1,
-	gravity(Grid, NumOfColumn, NumOfColumns, GG),
-	fillZeros(GG, FG).
+	gravity(Grid, NumOfColumn, NumOfColumns, GG).
 pathsDelete(Grid, ListOfPaths, NumOfColumns, Result) :-
 	ListOfPaths = [L | LT],
 	pathDeleteIndex(Grid, L, NumOfColumns, R, Rest),
