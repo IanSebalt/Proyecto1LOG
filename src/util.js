@@ -1,5 +1,5 @@
 export function numberToColor(num) {
-    if(num === "Booster"){
+    if(num === "Booster" || num === "Booster Camino Caro"){
        return "black"
     }
     else{
@@ -9,8 +9,6 @@ export function numberToColor(num) {
         return ColorList[index];
     }   
 }
-
-export const hexNum = (num) => num.toString(16);
 
 export const equalPos = (posA, posB) => posA.toString() === posB.toString();
 

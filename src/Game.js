@@ -66,6 +66,8 @@ function Game() {
           RGrids
         ).
     */
+    if(waiting)
+      return;
     const gridS = JSON.stringify(grid);
     const pathS = JSON.stringify(path);
     const queryS = "join(" + gridS + "," + numOfColumns + "," + pathS + ", RGrids)";
@@ -91,7 +93,7 @@ function Game() {
     if (restRGrids.length > 0) {
       setTimeout(() => {
         animateEffect(restRGrids);
-      }, 1000);
+      }, 100);
     } else {
       setWaiting(false);
     }
@@ -101,7 +103,6 @@ function Game() {
     if(waiting)
       return;
     const gridS = JSON.stringify(grid);
-    const pathS = JSON.stringify(path);
     const queryS = "collapse(" + gridS + "," + numOfColumns + ", RGrids)";
     setWaiting(true);
     pengine.query(queryS, (success, response) => {
@@ -140,11 +141,15 @@ function Game() {
         onDone={onPathDone}
       />
     <div className="header"></div>
-    <div className="squares" style={{ gridTemplateColumns: `repeat(${1}, 110px)`, gridTemplateRows: `repeat(${1}, 90px)` }}>
+    <div className="squares" style={{ gridTemplateColumns: `repeat(${2}, 110px)`, gridTemplateRows: `repeat(${2}, 90px)` }}>
             <Square
               value={"Booster"}
               className={"riseOnHover"}
               onClick={() => clickBooster()}
+            />
+            <Square
+              value={"Booster Camino Caro"}
+              className={"riseOnHover"}
             />
     </div>
     </div>

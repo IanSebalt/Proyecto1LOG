@@ -23,33 +23,11 @@ join(Grid, NumOfColumns, Path, [RG | GG]):-
 	gravity(RG, NumOfColumn, NumOfColumns, GG).
 
 /**
- * fillZeros(+Grid, -FG)
- * FG es la grilla con los ceros reemplazados en Grid que resultaron de la eliminación de/l los/el camino/s por una potencia de dos
- * aleatoria, de acuerdo a un rango.
-*/ 
-
-fillZeros(Grid, -1, Grid).
-fillZeros(Grid, NumOfColumn, FG) :-
-	\+nth0(NumOfColumn, Grid, 0),
-	NextColumn is NumOfColumn - 1,
-	fillZeros(Grid, NextColumn, FG).
-fillZeros(Grid, NumOfColumn, FG) :-
-	nth0(NumOfColumn, Grid, 0),
-	randomSquare(Grid, Square),
-	replace(Grid, NumOfColumn, Square, FPG),
-	NextColumn is NumOfColumn - 1,
-	fillZeros(FPG, NextColumn, FG).
-
-/**
  * randomSquare(-Square)
  * Square es un cuadrado de dos aleatorio.
 */
 
-randomSquare(_, Square) :-
-	%max_list(Grid, Max),
-	%logbN(Max, 2, Ans),
-	%F is Ans - 4,
-	%T is Ans - 2,
+randomSquare(Square) :-
     random_between(1, 5, Random),
     Square is 2 ** Random.
 
@@ -81,17 +59,11 @@ gravity(Grid, NumOfColumn, NumOfColumns, GList) :-
  * recorrer en la columna.
 */
 
-/**%gotGravCol(Grid, GFPath, NumOfColumns).
-%gravityOnColumn(Grid, [], GFPath, NumOfColumns, GCG) :-
-	%\+gotGravCol(Grid, GFPath, NumOfColumns),
-	%gravityOnColumn(Grid, GFPath, GFPath, NumOfColumns, GCG).
-*/
-
 gravityOnColumn(Grid, [], _, _, Grid).
 gravityOnColumn(Grid, GPath, GFPath, NumOfColumns, GCG) :-
 	GPath = [[X, Y] | GPT],
 	PosIns is (X * NumOfColumns) + (Y mod NumOfColumns),
-	randomSquare(Grid, Square),
+	randomSquare(Square),
 	X = 0,
 	((nth0(PosIns, Grid, 0),
 	replace(Grid, PosIns, Square, GR),
@@ -120,9 +92,9 @@ gravityOnColumn(Grid, GPath, GFPath, NumOfColumns, GCG) :-
 	gravityOnColumn(Grid, GPT, GFPath, NumOfColumns, GCG)).
 
 /**
- * gotGravCol(+Grid, +Bag, +NumOfColumns)
- * Devuelve true si la columna marcada por Bag tiene la gravedad aplicada, es decir, que no hay ningun 0 entre un bloque
- * de valor mayor y otro.
+ * gotGravOnAllCols(+Grid, +NumOfColumn, +NumOfColumns)
+ * Devuelve verdadero si la lista Grid que representa una grilla de NumOfColumns número de columnas tiene la gravedad
+ * aplicada, a partir de la columna NumOfColumn, numerada del 0 al 3, empezando de la columna de mayor coordenada Y hacia atrás.
 */
 
 gotGravOnAllCols(_, -1, _).
@@ -134,6 +106,12 @@ gotGravOnAllCols(Grid, NumOfColumn, NumOfColumns) :-
 	gotGravCol(Grid, Bag, NumOfColumns),
 	NextCol is NumOfColumn - 1,
 	gotGravOnAllCols(Grid, NextCol, NumOfColumns).
+
+/**
+ * gotGravCol(+Grid, +Bag, +NumOfColumns)
+ * Devuelve true si la columna marcada por Bag tiene la gravedad aplicada, es decir, que no hay ningun 0 entre un bloque
+ * de valor mayor y otro.
+*/
 
 gotGravCol(_, [], _).
 gotGravCol(Grid, Bag, NumOfColumns) :-
@@ -301,10 +279,6 @@ checkAdjacent(Grid, CurrentPath, Elem, PosPath, NumOfColumns, PathResult) :-
 checkAdjacent(Grid, CurrentPath, Elem, PosPath, NumOfColumns, PathResult) :-
 	PosPath = [X | XT],
 	\+nth0(X, Grid, Elem),
-	checkAdjacent(Grid, CurrentPath, Elem, XT, NumOfColumns, PathResult).
-checkAdjacent(Grid, CurrentPath, Elem, PosPath, NumOfColumns, PathResult) :-
-	PosPath = [X | XT],
-	X < 0,
 	checkAdjacent(Grid, CurrentPath, Elem, XT, NumOfColumns, PathResult).
 checkAdjacent(Grid, CurrentPath, Elem, PosPath, NumOfColumns, PathResult) :-
 	PosPath = [X | XT],
