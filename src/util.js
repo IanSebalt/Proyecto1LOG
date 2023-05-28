@@ -1,5 +1,5 @@
 export function numberToColor(num) {
-    if(num === "Booster" || num === "Booster Camino Caro"){
+    if(num === "Booster" || num === "Higher Path" || num == "Better Path"){
        return "black"
     }
     else{

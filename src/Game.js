@@ -141,15 +141,21 @@ function Game() {
         onDone={onPathDone}
       />
     <div className="header"></div>
-    <div className="squares" style={{ gridTemplateColumns: `repeat(${2}, 110px)`, gridTemplateRows: `repeat(${2}, 90px)` }}>
+    <div className="squares" style={{ gridTemplateColumns: `repeat(${3}, 110px)`, gridTemplateRows: `repeat(${3}, 90px)` }}>
             <Square
               value={"Booster"}
               className={"riseOnHover"}
               onClick={() => clickBooster()}
             />
             <Square
-              value={"Booster Camino Caro"}
+              value={"Higher Path"}
               className={"riseOnHover"}
+              //onClick={() => clickHigherPath()}
+            />
+            <Square
+              value={"Better Path"}
+              className={"riseOnHover"}
+              //onClick={() => clickBetterPath()}
             />
     </div>
     </div>
